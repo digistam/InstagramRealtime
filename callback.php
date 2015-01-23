@@ -11,10 +11,12 @@
 		
     if ($challenge) {
         echo $challenge;
-    }else{
+    }
+    else
+    {
         sleep(2);
-				$verify_token = '12345';
-				$hub_mode = $_GET['hub.mode'];
+		$verify_token = '12345';
+		$hub_mode = $_GET['hub.mode'];
         $myString = file_get_contents('php://input');
         $jsonArray = json_decode($myString);
 
@@ -30,42 +32,41 @@
             	$object = 'tags';
             }
             $time = $value ->time;
-			}
+		}
      				
-				$json = file_get_contents("https://api.instagram.com/v1/". $object ."/". $tag ."/media/recent?client_id=*****");
-				$data = json_decode($json);
+		$json = file_get_contents("https://api.instagram.com/v1/". $object ."/". $tag ."/media/recent?client_id=*****");
+		$data = json_decode($json);
 				
-				foreach(json_decode($json)->data as $item){		
-						$src = $item->images->standard_resolution->url;
-						$thumb = $item->images->thumbnail->url;
-						$url = $item->link;
-						$created_time = $item->created_time;
-						$created_time = gmdate("Y-m-d\TH:i:s\Z", $created_time);
-    				$longitude = $item->location->longitude;
-    				$latitude = $item->location->latitude;
-    				$location = $item->location->name;
-    				$location_id = $item->location->id;
-    				$username = $item->caption->from->username;
-    				$tags = $item->tags;
-    				$tags = implode(",", $tags);
-    				if ($object == 'geographies') {
-    					$keyword = 'Geo';
-    				} 
-						$sql = "INSERT INTO media (keyword, tags, picture, published, longitude, latitude, location, location_id, link, username) VALUES ('$keyword', '$tags', '$src', '$created_time', '$longitude', '$latitude', '$location', '$location_id', '$url', '$username');";
-						$retval = mysql_query( $sql, $db );
-						if(! $retval )
-						{
-  					die('Could not enter data: ' . mysql_error());
-						}
-
-						$sqldups = "DELETE a FROM MEDIA a, MEDIA b WHERE a.picture = b.picture AND a.id > b.id;";
-						$retval = mysql_query( $sqldups, $db );					
-						if(! $retval )
-						{
-  					die('Could not enter data: ' . mysql_error());
-						}
-				    mysql_close($db);
-				}
-    }
+		foreach(json_decode($json)->data as $item){
+    	    $src = $item->images->standard_resolution->url;
+			$thumb = $item->images->thumbnail->url;
+			$url = $item->link;
+			$created_time = $item->created_time;
+			$created_time = gmdate("Y-m-d\TH:i:s\Z", $created_time);
+    		$longitude = $item->location->longitude;
+    		$latitude = $item->location->latitude;
+    		$location = $item->location->name;
+    		$location_id = $item->location->id;
+    		$username = $item->caption->from->username;
+    		$tags = $item->tags;
+    		$tags = implode(",", $tags);
+    		if ($object == 'geographies') {
+        	    $keyword = 'Geo';
+    		}
+			$sql = "INSERT INTO media (keyword, tags, picture, published, longitude, latitude, location, location_id, link, username) VALUES ('$keyword', '$tags', '$src', '$created_time', '$longitude', '$latitude', '$location', '$location_id', '$url', '$username');";
+			$retval = mysql_query( $sql, $db );
+			if(! $retval )
+			{
+  		        die('Could not enter data: ' . mysql_error());
+			}
+			$sqldups = "DELETE a FROM MEDIA a, MEDIA b WHERE a.picture = b.picture AND a.id > b.id;";
+			$retval = mysql_query( $sqldups, $db );
+			if(! $retval )
+			{
+  			    die('Could not enter data: ' . mysql_error());
+			}
+			mysql_close($db);
+			}
+        }
     mysql_close($db);
 ?>
